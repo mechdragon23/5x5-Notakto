@@ -6,8 +6,8 @@ class Notakto(Game):
 
     #actions left over from game of nim, may need rework
     def actions(self, state):
-        return state.moves
-    
+        return state.moves.copy()
+
     #move creation finished
     def getmoves(self, board):
         moves = []
@@ -21,32 +21,18 @@ class Notakto(Game):
             print(row)
         return moves
 
-    #left over result functon from game of nim, non function, needs rework
+    #result updated finished - needs testing
     def result(self, state, move):
-        #change player
-        if(state.to_move == 'MIN'):
-            newtomove = 'MAX'
-        else:
-            newtomove = 'MIN'
+        i, j = move
+        board = state.board.copy()
+        board[i][j] = 1
+        return GameState(
+            to_move=('Min' if state.to_move == 'Max' else 'Max'),
+            utility=0,
+            board=board,
+            moves=self.getmoves(board)
+        )
 
-        #executing move
-        newboard = state.board.copy()
-        newboard[move[0]][move[1]] = 1
-
-        #defining moves
-        newmoves = self.getmoves(newboard)
-
-        #recalculating utility
-        if all(i == 0 for i in newboard):
-            if state.to_move == 'MAX':
-                newutil = -1
-            else:
-                newutil = 1
-        else:
-            newutil = 0
-
-        return GameState(to_move=newtomove, utility=newutil, board=newboard, moves=newmoves)
-    
     #utility function, non functional, needs rework
     def utility(self, state, player):
         if(player == 'MIN'):
@@ -91,18 +77,18 @@ class Notakto(Game):
     def display(self, state):
         print("board:")
         for row in state.board:
-            print(row)   
+            print(row)
 
-#main, might need work for proper implemenetation 
+#main, might need work for proper implemenetation
 if __name__ == "__main__":
-    #setting up the board 
+    #setting up the board
     #this is a 2d array in which 0's are considered empty space and 1's are X's or occupied space
     row = 5
     col = 5
     arr = [[0 for i in range(col)] for j in range(row)]
 
     nim = Notakto(board=arr)  # Creating the game instance
-    utility = nim.play_game(alpha_beta_player, query_player) # computer moves first 
+    utility = nim.play_game(alpha_beta_player, query_player) # computer moves first
     if (utility < 0):
         print("MIN won the game")
     else:
