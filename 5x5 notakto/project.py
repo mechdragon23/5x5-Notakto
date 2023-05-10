@@ -1,8 +1,9 @@
 from games import *
+from copy import deepcopy
 
 class Notakto(Game):
     def __init__(self, board):
-        self.initial = GameState(to_move='Min', utility=0, board=board, moves=self.getmoves(board))
+        self.initial = GameState(to_move='Max', utility=0, board=board, moves=self.getmoves(board))
 
     #actions left over from game of nim, may need rework
     def actions(self, state):
@@ -24,7 +25,7 @@ class Notakto(Game):
     #result updated finished - needs testing
     def result(self, state, move):
         i, j = move
-        board = state.board.copy()
+        board = deepcopy(state.board)
         board[i][j] = 1
         return GameState(
             to_move=('Min' if state.to_move == 'Max' else 'Max'),
@@ -36,10 +37,8 @@ class Notakto(Game):
     #utility works
     def utility(self, state, player):
         if self.terminal_test(state):
-            if player == 'Max':
-                return -1
-            else:
-                return 1
+            if player == 'Max': return -1
+            else: return 1
 
     #terminal test finished
     def terminal_test(self, state):
@@ -89,7 +88,7 @@ if __name__ == "__main__":
     arr = [[0 for i in range(col)] for j in range(row)]
 
     nim = Notakto(board=arr)  # Creating the game instance
-    utility = nim.play_game(query_player, random_player) # computer moves first
+    utility = nim.play_game(alpha_beta_player, query_player) # computer moves first
     if (utility < 0):
         print("MIN won the game")
     else:
