@@ -1,5 +1,9 @@
 from games import *
 from copy import deepcopy
+# import logging    # first of all import the module
+
+# logging.basicConfig(filename='debug.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
+# logging.warning('This message will get logged on to a file')
 
 class Notakto(Game):
     def __init__(self, board):
@@ -36,9 +40,9 @@ class Notakto(Game):
 
     #utility works
     def utility(self, state, player):
-        if self.terminal_test(state):
-            if player == 'Max': return -1
-            else: return 1
+        # if self.terminal_test(state):
+        if state.to_move == 'Max': return -1
+        else: return 1
 
     #terminal test finished
     def terminal_test(self, state):
@@ -88,7 +92,7 @@ if __name__ == "__main__":
     arr = [[0 for i in range(col)] for j in range(row)]
 
     nim = Notakto(board=arr)  # Creating the game instance
-    utility = nim.play_game(alpha_beta_player, query_player) # computer moves first
+    utility = nim.play_game(query_player, alpha_beta_player) # computer moves first
     if (utility < 0):
         print("MIN won the game")
     else:
