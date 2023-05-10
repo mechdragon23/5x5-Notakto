@@ -37,7 +37,7 @@ class Notakto(Game):
     #utility works
     def utility(self, state, player):
         if self.terminal_test(state):
-            if player == 'Max': return -1
+            if state.to_move == 'Max': return -1
             else: return 1
 
     #terminal test finished
