@@ -1,8 +1,8 @@
 from games import *
 
 class Notakto(Game):
-    def __init__(self, board=[]):
-        self.initial = GameState(to_move='MIN', utility=0, board=board, moves=self.getmoves(board))
+    def __init__(self, board):
+        self.initial = GameState(to_move='Min', utility=0, board=board, moves=self.getmoves(board))
 
     #actions left over from game of nim, may need rework
     def actions(self, state):
@@ -16,9 +16,9 @@ class Notakto(Game):
                 if board[i][j] == 0:    #if space is empty
                     moves.append([i,j]) #add x and y cords to the moves array
         #printing moves and board, used for debugging
-        print(moves)
-        for row in board:
-            print(row)
+        # print(moves)
+        # for row in board:
+        #     print(row)
         return moves
 
     #result updated finished - needs testing
@@ -33,12 +33,13 @@ class Notakto(Game):
             moves=self.getmoves(board)
         )
 
-    #utility function, non functional, needs rework
+    #utility works
     def utility(self, state, player):
-        if(player == 'MIN'):
-            return -1
-        else:
-            return 1
+        if self.terminal_test(state):
+            if player == 'Max':
+                return -1
+            else:
+                return 1
 
     #terminal test finished
     def terminal_test(self, state):
@@ -88,7 +89,7 @@ if __name__ == "__main__":
     arr = [[0 for i in range(col)] for j in range(row)]
 
     nim = Notakto(board=arr)  # Creating the game instance
-    utility = nim.play_game(alpha_beta_player, query_player) # computer moves first
+    utility = nim.play_game(query_player, random_player) # computer moves first
     if (utility < 0):
         print("MIN won the game")
     else:
