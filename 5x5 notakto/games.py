@@ -9,6 +9,12 @@ import numpy as np
 
 from utils import vector_add
 
+# debugging
+import logging    # first of all import the module
+
+logging.basicConfig(filename='std_alpha.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
+# logging.warning('This message will get logged on to a file')
+
 GameState = namedtuple('GameState', 'to_move, utility, board, moves')
 StochasticGameState = namedtuple('StochasticGameState', 'to_move, utility, board, moves, chance')
 
@@ -89,7 +95,6 @@ def expect_minmax(state, game):
 def alpha_beta_search(state, game):
     """Search game to determine best action; use alpha-beta pruning.
     As in [Figure 5.7], this version searches all the way to the leaves."""
-
     player = game.to_move(state)
 
     # Functions used by alpha_beta
@@ -158,6 +163,8 @@ def alpha_beta_cutoff_search(state, game, d=4, cutoff_test=None, eval_fn=None):
 
     # Body of alpha_beta_cutoff_search starts here:
     # The default test cuts off at depth d or at a terminal state
+    if len(state.moves) == 25:
+        return state.moves[random.randint(0, 24)]
     cutoff_test = (cutoff_test or (lambda state, depth: depth > d or game.terminal_test(state)))
     eval_fn = eval_fn or (lambda state: game.utility(state, player))
     best_score = -np.inf
@@ -209,6 +216,9 @@ def minmax_player(game,state):
 def expect_minmax_player(game, state):
     return expect_minmax(state, game)
 
+def alpha_beta_cutoff_player(game, state):
+    return alpha_beta_cutoff_search(state, game, d=4, cutoff_test=None, eval_fn=game.evaluation)
+
 
 # ______________________________________________________________________________
 # Some Sample Games
@@ -257,6 +267,7 @@ class Game:
             for player in players:
                 move = player(self, state)
                 state = self.result(state, move)
+                self.display(state)
                 if self.terminal_test(state):
                     self.display(state)
                     return self.utility(state, self.to_move(self.initial))

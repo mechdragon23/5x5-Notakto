@@ -1,5 +1,10 @@
 from games import *
 from copy import deepcopy
+import random
+# import logging    # first of all import the module
+
+# logging.basicConfig(filename='debug.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
+# logging.warning('This message will get logged on to a file')
 
 class Notakto(Game):
     def __init__(self, board):
@@ -10,16 +15,47 @@ class Notakto(Game):
         return state.moves.copy()
 
     #move creation finished
+    # def getmoves(self, board):
+    #     moves = []
+    #     for i in range(5):  #for each row
+    #         for j in range(5):  #for each col
+    #             if board[i][j] == 0:    #if space is empty
+    #                 moves.append([i,j]) #add x and y cords to the moves array
+    #     #printing moves and board, used for debugging
+    #     # print(moves)
+    #     # for row in board:
+    #     #     print(row)
+    #     # random.shuffle(moves)
+    #     return moves
+
+    #the revised getmoves returns non losing moves only loosing move is defined as a move that would result in three 1's in a row in all directions including diagonals
     def getmoves(self, board):
+    # Initialize the valid positions list
         moves = []
-        for i in range(5):  #for each row
-            for j in range(5):  #for each col
-                if board[i][j] == 0:    #if space is empty
-                    moves.append([i,j]) #add x and y cords to the moves array
-        #printing moves and board, used for debugging
-        # print(moves)
-        # for row in board:
-        #     print(row)
+
+        # Iterate over the 5x5 board
+        for i in range(5):
+            for j in range(5):
+                if board[i][j] == 0:
+                    # Check all eight directions for two consecutive 1s and a 1 separated by space
+                    directions = [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (-1, -1), (1, -1), (-1, 1)]
+                    valid = True
+                    for dx, dy in directions:
+                        count = 0
+                        for step in range(1, 3):
+                            x, y = i + step * dx, j + step * dy
+                            if 0 <= x < 5 and 0 <= y < 5 and board[x][y] == 1:
+                                count += 1
+                            else:
+                                break
+                        # Check for a separated 1 in both directions
+                        next_x, next_y = i + 3 * dx, j + 3 * dy
+                        if count == 2 or (count == 1 and 0 <= next_x < 5 and 0 <= next_y < 5 and board[next_x][next_y] == 1):
+                            valid = False
+                            break
+                    if valid:
+                        moves.append((i, j))
+
         return moves
 
     #result updated finished - needs testing
@@ -36,12 +72,25 @@ class Notakto(Game):
 
     #utility works
     def utility(self, state, player):
-        if self.terminal_test(state):
-            if state.to_move == 'Max': return -1
-            else: return 1
+        if state.to_move == 'Max': return -25
+        else: return 25
 
-    #terminal test finished
+    def evaluation(self, state):
+        num_moves = -1 if len(state.moves) == 0 else len(state.moves)
+        if state.to_move == 'Max': return 25/num_moves
+        else: return -25/num_moves
+
+    #terminal test
     def terminal_test(self, state):
+        return not self.actions(state)
+
+    #cutoff test
+    # def cutoff_test(self, state, depth):
+    #     return self.is_loose_condition(state) or depth > 4 or self.terminal_test(state)
+
+    #currently unused
+    def is_loose_condition(self, state):
+        # check for loosing condition
         for i in range(5):  #for each row
             for j in range(5):  #for each col
                 #detect if X is there
@@ -85,10 +134,27 @@ if __name__ == "__main__":
     #this is a 2d array in which 0's are considered empty space and 1's are X's or occupied space
     row = 5
     col = 5
-    arr = [[0 for i in range(col)] for j in range(row)]
+    empty_board = [[0 for i in range(col)] for j in range(row)]
 
-    nim = Notakto(board=arr)  # Creating the game instance
-    utility = nim.play_game(alpha_beta_player, query_player) # computer moves first
+    board = [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [1,1,1,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+    ]
+
+    board2 = [
+        [0, 1, 0, 1, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 1, 0, 1]
+    ]
+
+    notakto = Notakto(board=empty_board)  # Creating the game instance
+    # print(notakto.getmoves(board2))
+    utility = notakto.play_game(alpha_beta_cutoff_player, alpha_beta_cutoff_player) # computer moves first
     if (utility < 0):
         print("MIN won the game")
     else:
