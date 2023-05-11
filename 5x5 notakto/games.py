@@ -9,9 +9,10 @@ import numpy as np
 
 from utils import vector_add
 
+# debugging
 import logging    # first of all import the module
 
-logging.basicConfig(filename='std.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(filename='std_alpha.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
 # logging.warning('This message will get logged on to a file')
 
 GameState = namedtuple('GameState', 'to_move, utility, board, moves')
@@ -95,13 +96,13 @@ def alpha_beta_search(state, game):
     """Search game to determine best action; use alpha-beta pruning.
     As in [Figure 5.7], this version searches all the way to the leaves."""
     player = game.to_move(state)
-    # logging.warning(f"player at start of function is: {player} ")
 
     # Functions used by alpha_beta
     def max_value(state, alpha, beta):
         # print(f"max_value called with player: {player}")
+        logging.warning(f"max_val called with player: {state.to_move}, state: {state.board}, alpha: {alpha}, beta: {beta}")
         if game.terminal_test(state):
-            # logging.warning(f"max_val - return utility: {game.utility(state, player)}, for player: {player}, state: {state.board}")
+            logging.warning(f"terminal state - return utility: {game.utility(state, player)}, for player: {state.to_move}, state: {state.board}")
             # print(f"max_value called state.player: {state.to_move}, player: {player}")
             return game.utility(state, player)
         v = -np.inf
@@ -110,14 +111,15 @@ def alpha_beta_search(state, game):
             if v >= beta:
                 return v
             alpha = max(alpha, v)
-        # logging.warning(f"max_val - player: {player}, state: {state.board}, v: {v}, alpha: {alpha}, beta: {beta}, a: {a}, max_val - return: {v}")
+        logging.warning(f"max_val return: player {state.to_move}, state: {state.board}, v: {v}, alpha: {alpha}, beta: {beta}, a: {a}, max_val - return: {v}")
         return v
 
     def min_value(state, alpha, beta):
+        logging.warning(f"min_val called with player: {state.to_move}, state: {state.board}, alpha: {alpha}, beta: {beta}")
         if game.terminal_test(state):
             # print(f"min_value called with player: {player}")
-            # logging.warning(f"min_val - return utility: {game.utility(state, player)}, for player: {player}, state: {state.board}")
             # print(f"min_value called state.player: {state.to_move}, player: {player}")
+            logging.warning(f"terminal state - return utility: {game.utility(state, player)}, for player: {state.to_move}, state: {state.board}")
             return game.utility(state, player)
         v = np.inf
         for a in game.actions(state):
@@ -125,10 +127,12 @@ def alpha_beta_search(state, game):
             if v <= alpha:
                 return v
             beta = min(beta, v)
-        # logging.warning(f"min_val - player: {player}, state: {state.board}, v: {v}, alpha: {alpha}, beta: {beta}, a: {a}, min_val - return: {v}")
+        logging.warning(f"min_val return: player {state.to_move}, state: {state.board}, v: {v}, alpha: {alpha}, beta: {beta}, a: {a}, min_val - return: {v}")
         return v
 
     # Body of alpha_beta_search:
+    logging.warning(f"alpha-beta function call: {player} ")
+
     best_score = -np.inf
     beta = np.inf
     best_action = None
@@ -137,7 +141,7 @@ def alpha_beta_search(state, game):
         if v > best_score:
             best_score = v
             best_action = a
-    # logging.warning(f"best_action: {best_action}, best_score: {best_score}, beta: {beta}, state: {state.board}, player: {player}")
+    logging.warning(f"best_action: {best_action}, best_score: {best_score}, beta: {beta}, state: {state.board}, player: {player}")
     return best_action
 
 

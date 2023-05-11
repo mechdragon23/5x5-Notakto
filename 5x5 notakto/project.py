@@ -1,5 +1,6 @@
 from games import *
 from copy import deepcopy
+import random
 # import logging    # first of all import the module
 
 # logging.basicConfig(filename='debug.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
@@ -24,6 +25,7 @@ class Notakto(Game):
         # print(moves)
         # for row in board:
         #     print(row)
+        # random.shuffle(moves)
         return moves
 
     #result updated finished - needs testing
@@ -89,10 +91,18 @@ if __name__ == "__main__":
     #this is a 2d array in which 0's are considered empty space and 1's are X's or occupied space
     row = 5
     col = 5
-    arr = [[0 for i in range(col)] for j in range(row)]
+    empty_board = [[0 for i in range(col)] for j in range(row)]
 
-    nim = Notakto(board=arr)  # Creating the game instance
-    utility = nim.play_game(query_player, alpha_beta_player) # computer moves first
+    board = [
+        [1,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,1,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+    ]
+
+    notakto = Notakto(board=board)  # Creating the game instance
+    utility = notakto.play_game(alpha_beta_player, query_player) # computer moves first
     if (utility < 0):
         print("MIN won the game")
     else:
