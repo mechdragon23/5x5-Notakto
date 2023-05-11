@@ -101,7 +101,7 @@ if __name__ == "__main__":
         [0,0,0,0,0]
     ]
 
-    notakto = Notakto(board=board)  # Creating the game instance
+    notakto = Notakto(board=empty_board)  # Creating the game instance
     utility = notakto.play_game(alpha_beta_player, query_player) # computer moves first
     if (utility < 0):
         print("MIN won the game")
