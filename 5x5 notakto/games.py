@@ -99,11 +99,7 @@ def alpha_beta_search(state, game):
 
     # Functions used by alpha_beta
     def max_value(state, alpha, beta):
-        # print(f"max_value called with player: {player}")
-        logging.warning(f"max_val called with player: {state.to_move}, state: {state.board}, alpha: {alpha}, beta: {beta}")
         if game.terminal_test(state):
-            logging.warning(f"terminal state - return utility: {game.utility(state, player)}, for player: {state.to_move}, state: {state.board}")
-            # print(f"max_value called state.player: {state.to_move}, player: {player}")
             return game.utility(state, player)
         v = -np.inf
         for a in game.actions(state):
@@ -111,15 +107,10 @@ def alpha_beta_search(state, game):
             if v >= beta:
                 return v
             alpha = max(alpha, v)
-        logging.warning(f"max_val return: player {state.to_move}, state: {state.board}, v: {v}, alpha: {alpha}, beta: {beta}, a: {a}, max_val - return: {v}")
         return v
 
     def min_value(state, alpha, beta):
-        logging.warning(f"min_val called with player: {state.to_move}, state: {state.board}, alpha: {alpha}, beta: {beta}")
         if game.terminal_test(state):
-            # print(f"min_value called with player: {player}")
-            # print(f"min_value called state.player: {state.to_move}, player: {player}")
-            logging.warning(f"terminal state - return utility: {game.utility(state, player)}, for player: {state.to_move}, state: {state.board}")
             return game.utility(state, player)
         v = np.inf
         for a in game.actions(state):
@@ -127,12 +118,9 @@ def alpha_beta_search(state, game):
             if v <= alpha:
                 return v
             beta = min(beta, v)
-        logging.warning(f"min_val return: player {state.to_move}, state: {state.board}, v: {v}, alpha: {alpha}, beta: {beta}, a: {a}, min_val - return: {v}")
         return v
 
     # Body of alpha_beta_search:
-    logging.warning(f"alpha-beta function call: {player} ")
-
     best_score = -np.inf
     beta = np.inf
     best_action = None
@@ -141,7 +129,6 @@ def alpha_beta_search(state, game):
         if v > best_score:
             best_score = v
             best_action = a
-    logging.warning(f"best_action: {best_action}, best_score: {best_score}, beta: {beta}, state: {state.board}, player: {player}")
     return best_action
 
 
@@ -176,6 +163,8 @@ def alpha_beta_cutoff_search(state, game, d=4, cutoff_test=None, eval_fn=None):
 
     # Body of alpha_beta_cutoff_search starts here:
     # The default test cuts off at depth d or at a terminal state
+    if len(state.moves) == 25:
+        return state.moves[random.randint(0, 24)]
     cutoff_test = (cutoff_test or (lambda state, depth: depth > d or game.terminal_test(state)))
     eval_fn = eval_fn or (lambda state: game.utility(state, player))
     best_score = -np.inf
@@ -227,6 +216,9 @@ def minmax_player(game,state):
 def expect_minmax_player(game, state):
     return expect_minmax(state, game)
 
+def alpha_beta_cutoff_player(game, state):
+    return alpha_beta_cutoff_search(state, game, d=4, cutoff_test=None, eval_fn=game.evaluation)
+
 
 # ______________________________________________________________________________
 # Some Sample Games
@@ -275,6 +267,7 @@ class Game:
             for player in players:
                 move = player(self, state)
                 state = self.result(state, move)
+                self.display(state)
                 if self.terminal_test(state):
                     self.display(state)
                     return self.utility(state, self.to_move(self.initial))
