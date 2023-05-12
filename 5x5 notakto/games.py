@@ -8,12 +8,8 @@ from collections import namedtuple
 import numpy as np
 
 from utils import vector_add
+from collections import defaultdict
 
-# debugging
-import logging    # first of all import the module
-
-logging.basicConfig(filename='std_alpha.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
-# logging.warning('This message will get logged on to a file')
 
 GameState = namedtuple('GameState', 'to_move, utility, board, moves')
 StochasticGameState = namedtuple('StochasticGameState', 'to_move, utility, board, moves, chance')
@@ -163,8 +159,8 @@ def alpha_beta_cutoff_search(state, game, d=4, cutoff_test=None, eval_fn=None):
 
     # Body of alpha_beta_cutoff_search starts here:
     # The default test cuts off at depth d or at a terminal state
-    if len(state.moves) == 25:
-        return state.moves[random.randint(0, 24)]
+    if len(state.moves) == game.value:
+        return state.moves[random.randint(0, game.value - 1)]
     cutoff_test = (cutoff_test or (lambda state, depth: depth > d or game.terminal_test(state)))
     eval_fn = eval_fn or (lambda state: game.utility(state, player))
     best_score = -np.inf
@@ -217,7 +213,14 @@ def expect_minmax_player(game, state):
     return expect_minmax(state, game)
 
 def alpha_beta_cutoff_player(game, state):
-    return alpha_beta_cutoff_search(state, game, d=4, cutoff_test=None, eval_fn=game.evaluation)
+    depth = defaultdict(lambda: 1)
+    depth.update({
+        5: 4,
+        6: 3,
+        7: 2,
+        8: 2
+    })
+    return alpha_beta_cutoff_search(state, game, d=depth[game.board_size], cutoff_test=None, eval_fn=game.evaluation)
 
 
 # ______________________________________________________________________________

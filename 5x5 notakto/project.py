@@ -3,7 +3,10 @@ from copy import deepcopy
 
 class Notakto(Game):
     def __init__(self, board):
+        self.board_size = len(board)
+        self.value = len(board)**2
         self.initial = GameState(to_move='Max', utility=0, board=board, moves=self.getmoves(board))
+
 
     # returns a list of legal moves given a state
     def actions(self, state):
@@ -14,11 +17,11 @@ class Notakto(Game):
         moves = []
 
         def is_inbound(x, y):
-            return 0 <= x < 5 and 0 <= y < 5
+            return 0 <= x < self.board_size and 0 <= y < self.board_size
 
         # iterate over the 5x5 board
-        for i in range(5):
-            for j in range(5):
+        for i in range(self.board_size):
+            for j in range(self.board_size):
                 if board[i][j] == 0:
 
                     # define the 8 directions to check
@@ -61,14 +64,14 @@ class Notakto(Game):
 
     # returns the utility value of a state
     def utility(self, state, player):
-        if state.to_move == 'Max': return -25
-        else: return 25
+        if state.to_move == 'Max': return -self.value
+        else: return self.value
 
     # returns the utility value of a state
     def evaluation(self, state):
         num_moves = -1 if len(state.moves) == 0 else len(state.moves)
-        if state.to_move == 'Max': return 25/num_moves
-        else: return -25/num_moves
+        if state.to_move == 'Max': return self.value/num_moves
+        else: return -self.value/num_moves
 
     # returns true if the state is a terminal state
     def terminal_test(self, state):
@@ -84,11 +87,12 @@ class Notakto(Game):
 if __name__ == "__main__":
     #setting up the board
     #this is a 2d array in which 0's are considered empty space and 1's are X's or occupied space
-    row = 5
-    col = 5
+    row = 12
+    col = 12
     empty_board = [[0 for i in range(col)] for j in range(row)]
 
     notakto = Notakto(board=empty_board)  # Creating the game instance
+    # print(Notakto.board_size)
     utility = notakto.play_game(alpha_beta_cutoff_player, alpha_beta_cutoff_player) # computer moves first
     if (utility < 0):
         print("MIN won the game")
