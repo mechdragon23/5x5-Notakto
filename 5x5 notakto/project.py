@@ -74,41 +74,6 @@ class Notakto(Game):
     def terminal_test(self, state):
         return not self.actions(state)
 
-    # returns true if a loosing condition is found in the state
-    # currently unused
-    def is_loose_condition(self, state):
-        # check for loosing condition
-        for i in range(5):  #for each row
-            for j in range(5):  #for each col
-                #detect if X is there
-                if state.board[i][j] == 1:
-                    #checking backwards diagonal
-                    # 0 0 1
-                    # 0 1 0
-                    # 1 0 0
-                    if j > 1 and i < 3 and state.board[i+1][j-1] == 1 and state.board[i+2][j-2] == 1:
-                        return True
-                    #checking vertical down
-                    # 0 1 0
-                    # 0 1 0
-                    # 0 1 0
-                    if i < 3 and state.board[i+1][j] == 1 and state.board[i+2][j] == 1:
-                        return True
-                    #checking diagonal down
-                    # 1 0 0
-                    # 0 1 0
-                    # 0 0 1
-                    if i < 3 and j < 3 and state.board[i+1][j+1] == 1 and state.board[i+2][j+2] == 1:
-                        return True
-                    #checking horizontal
-                    # 1 1 1
-                    # 0 0 0
-                    # 0 0 0
-                    if j < 3 and state.board[i][j+1] == 1 and state.board[i][j+2] == 1:
-                        return True
-        #if no match return false
-        return False
-
     # displays board to console
     def display(self, state):
         print("board:")
