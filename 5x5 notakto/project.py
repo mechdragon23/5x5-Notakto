@@ -83,17 +83,26 @@ class Notakto(Game):
         for row in state.board:
             print(row)
 
+    def cutoff_test(self, state, depth):
+        if depth >= 3:
+            return True
+        return False
+
 
 if __name__ == "__main__":
     #setting up the board
     #this is a 2d array in which 0's are considered empty space and 1's are X's or occupied space
-    row = 12
-    col = 12
-    empty_board = [[0 for i in range(col)] for j in range(row)]
+    def board(size):
+        row = size
+        col = size
+        empty_board = [[0 for i in range(col)] for j in range(row)]
+        return empty_board
+
+    empty_board = board(8)
 
     notakto = Notakto(board=empty_board)  # Creating the game instance
     # print(Notakto.board_size)
-    utility = notakto.play_game(alpha_beta_cutoff_player, alpha_beta_cutoff_player) # computer moves first
+    utility = notakto.play_game(AI_medium, AI_medium) # computer moves first
     if (utility < 0):
         print("MIN won the game")
     else:
