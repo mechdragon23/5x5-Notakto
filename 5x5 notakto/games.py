@@ -1,14 +1,8 @@
-"""Games or Adversarial Search (Chapter 5)"""
-
-# import copy
-# import itertools
 import random
-from collections import namedtuple
-
 import numpy as np
+from collections import namedtuple, defaultdict
+from math import sqrt
 
-# from utils import vector_add
-from collections import defaultdict
 
 
 GameState = namedtuple('GameState', 'to_move, utility, board, moves')
@@ -106,7 +100,17 @@ def AI_medium(game, state):
 
 def AI_hard(game, state):
     """A player who is more strategic and thinks more moves ahead when best to do so."""
-    return alpha_beta_cutoff_search(state, game, cutoff_test=game.cutoff_test, eval_fn=game.evaluation)
+    b = int(sqrt(len(state.moves)))
+    depth = defaultdict(lambda: 1)
+    depth.update({
+        4: 5,
+        5: 4,
+        6: 3,
+        7: 2,
+        8: 2,
+    })
+    d = np.inf if b < 4 else depth[b]
+    return alpha_beta_cutoff_search(state, game, d=d, eval_fn=game.evaluation)
 
 
 # ______________________________________________________________________________
