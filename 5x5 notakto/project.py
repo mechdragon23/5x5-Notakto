@@ -83,8 +83,8 @@ class Notakto(Game):
         for row in state.board:
             print(row)
 
-    # return true if a loose condition is met
-    def is_loose_condition(self, state):
+    # return true if a lose condition is met
+    def is_lose_condition(self, state):
         for i in range(self.board_size):
             for j in range(self.board_size):
 

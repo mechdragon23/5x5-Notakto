@@ -82,7 +82,7 @@ class MyGame(arcade.Window):
                 self.board[row][column] = 1
                 move = (row, column)
                 state = self.game.result(self.game.state, move)
-                if self.game.is_loose_condition(state):
+                if self.game.is_lose_condition(state):
                     print('Game Over')
                     arcade.exit()
                 self.game.state = state
