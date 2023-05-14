@@ -83,6 +83,39 @@ class Notakto(Game):
         for row in state.board:
             print(row)
 
+    # return true if a loose condition is met
+    def is_loose_condition(self, state):
+        for i in range(self.board_size):
+            for j in range(self.board_size):
+
+                if state.board[i][j] == 1:
+                    # checking diagonal up /
+                    # 0 0 1
+                    # 0 1 0
+                    # 1 0 0
+                    if j < self.board_size - 2 and i > 1 and state.board[i-1][j+1] == 1 and state.board[i-2][j+2] == 1:
+                        return True
+                    #checking vertical down
+                    # 0 1 0
+                    # 0 1 0
+                    # 0 1 0
+                    if i < self.board_size - 2 and state.board[i+1][j] == 1 and state.board[i+2][j] == 1:
+                        return True
+                    #checking diagonal down
+                    # 1 0 0
+                    # 0 1 0
+                    # 0 0 1
+                    if i < self.board_size - 2 and j < self.board_size and state.board[i+1][j+1] == 1 and state.board[i+2][j+2] == 1:
+                        return True
+                    #checking horizontal
+                    # 1 1 1
+                    # 0 0 0
+                    # 0 0 0
+                    if j < self.board_size - 2 and state.board[i][j+1] == 1 and state.board[i][j+2] == 1:
+                        return True
+        #if no match return false
+        return False
+
 if __name__ == "__main__":
     # returns a board (2D list) of give size
     def board(size):
