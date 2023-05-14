@@ -99,8 +99,8 @@ def AI_medium(game, state):
     return alpha_beta_cutoff_search(state, game, d=depth[game.board_size], cutoff_test=None, eval_fn=game.evaluation)
 
 def AI_hard(game, state):
-    """A player who is more strategic and thinks more moves ahead when best to do so."""
-    b = int(sqrt(len(state.moves)))
+    """A player who is more strategic and thinks more moves ahead when as the game progresses."""
+    b = round(sqrt(len(state.moves)))
     depth = defaultdict(lambda: 1)
     depth.update({
         4: 5,
@@ -158,8 +158,10 @@ class Game:
         while True:
             for player in players:
                 move = player(self, state)
+                print(f"\nPlayer {state.to_move} {move} n moves: {len(state.moves)}")
                 state = self.result(state, move)
                 self.display(state)
                 if self.terminal_test(state):
+                    print(f"\nPlayer {state.to_move} Looses n moves: {len(self.actions(state))}")
                     self.display(state)
                     return self.utility(state, self.to_move(self.initial))

@@ -79,25 +79,37 @@ class Notakto(Game):
 
     # displays board to console
     def display(self, state):
-        print("board:")
         for row in state.board:
             print(row)
-        print(f"{state.to_move}, n moves: {len(state.moves)}")
 
 if __name__ == "__main__":
-    #setting up the board
-    #this is a 2d array in which 0's are considered empty space and 1's are X's or occupied space
+    # returns a board (2D list) of give size
     def board(size):
         row = size
         col = size
         empty_board = [[0 for i in range(col)] for j in range(row)]
         return empty_board
 
-    empty_board = board(12)
+    # create board
+    # note: the upper limit of board size is limited by time and ressources.
+    # Hard AI vs Medium AI on a 15x15 board takes about 2 min 24 sec to complete
+    SIZE = 15
+    empty_board = board(SIZE)
 
-    notakto = Notakto(board=empty_board)  # Creating the game instance
-    # print(Notakto.board_size)
-    utility = notakto.play_game(AI_hard, AI_medium) # computer moves first
+    # initialize game instance
+    game = Notakto(board=empty_board)
+
+    ###########################################################################
+    #                      available AI's to play against                     #
+    ###########################################################################
+    #
+    # AI_silly - makes random moves
+    # AI_easy - thinks one move ahead
+    # AI_medium - thinks a few moves ahead, but panics as board size increases
+    # AI_hard - thinks a few moves ahead, and is not afraid of large boards
+
+    # AI hard beats AI medium 100% of the time
+    utility = game.play_game(AI_hard, AI_medium)
     if (utility < 0):
         print("MIN won the game")
     else:
