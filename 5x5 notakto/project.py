@@ -105,7 +105,7 @@ class Notakto(Game):
                     # 1 0 0
                     # 0 1 0
                     # 0 0 1
-                    if i < self.board_size - 2 and j < self.board_size and state.board[i+1][j+1] == 1 and state.board[i+2][j+2] == 1:
+                    if i < self.board_size - 2 and j < self.board_size - 2 and state.board[i+1][j+1] == 1 and state.board[i+2][j+2] == 1:
                         return True
                     #checking horizontal
                     # 1 1 1

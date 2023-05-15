@@ -17,7 +17,7 @@ MARGIN = 5
 # Do the math to figure out our screen dimensions
 SCREEN_WIDTH = (WIDTH + MARGIN) * COLUMN_COUNT + MARGIN
 SCREEN_HEIGHT = (HEIGHT + MARGIN) * ROW_COUNT + MARGIN
-SCREEN_TITLE = "Array Backed Grid Example"
+SCREEN_TITLE = "15 x 15 Notakto"
 
 
 class MyGame(arcade.Window):
@@ -82,10 +82,12 @@ class MyGame(arcade.Window):
                 self.board[row][column] = 1
                 move = (row, column)
                 state = self.game.result(self.game.state, move)
+                self.game.state = state
+
+                # check if player made a losing move
                 if self.game.is_lose_condition(state):
                     print('Game Over')
                     arcade.exit()
-                self.game.state = state
             # else:
             #     self.board[row][column] = 0
 
