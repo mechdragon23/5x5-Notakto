@@ -84,9 +84,10 @@ class StartView(arcade.View):
         # handle settings button click events
         @settings_button.event("on_click")
         def on_click_settings_button(event):
-            if self.window.current_view == self:
-                settings_view = SettingsView()
-                self.window.show_view(settings_view)
+            pass
+            # if self.window.current_view == self:
+            #     settings_view = SettingsView()
+            #     self.window.show_view(settings_view)
 
         # create a quit button
         quit_button = arcade.gui.UIFlatButton(text="Quit", width=200)
@@ -210,10 +211,7 @@ class GameOverView(arcade.View):
 
     def on_mouse_press(self, _x, _y, _button, _modifiers):
         start_view = StartView()
-        # start_view.setup()
         self.window.show_view(start_view)
-
-
 
 if __name__ == "__main__":
 
