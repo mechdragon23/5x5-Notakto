@@ -2,6 +2,7 @@ import arcade
 from arcade.gui import UIManager
 from games import *
 from project import *
+import time
 
 # Set how many rows and columns we will have
 ROW_COUNT = 15
@@ -71,9 +72,10 @@ class StartView(arcade.View):
         # handle start button click events
         @start_button.event("on_click")
         def on_click_start_button(event):
-            game_view = GameView()
-            game_view.setup()
-            self.window.show_view(game_view)
+            if self.window.current_view == self:
+                game_view = GameView()
+                game_view.setup()
+                self.window.show_view(game_view)
 
         # create a settings button
         settings_button = arcade.gui.UIFlatButton(text="Settings", width=200)
@@ -82,7 +84,9 @@ class StartView(arcade.View):
         # handle settings button click events
         @settings_button.event("on_click")
         def on_click_settings_button(event):
-            print("Settings:", event)
+            if self.window.current_view == self:
+                settings_view = SettingsView()
+                self.window.show_view(settings_view)
 
         # create a quit button
         quit_button = arcade.gui.UIFlatButton(text="Quit", width=200)
@@ -91,7 +95,8 @@ class StartView(arcade.View):
         # handle quit button click events
         @quit_button.event("on_click")
         def on_click_quit_button(event):
-            arcade.exit()
+            if self.window.current_view == self:
+                arcade.exit()
 
         self.manager.add(
             arcade.gui.UIAnchorWidget(
@@ -100,41 +105,20 @@ class StartView(arcade.View):
                 child=self.v_box)
         )
 
-    # def on_click_start(self, event):
-    #     game_view = GameView()
-    #     self.window.show_view(game_view)
-
     def on_draw(self):
         self.clear()
         self.manager.draw()
-
 
 class SettingsView(arcade.View):
     def __init__(self):
         super().__init__()
-        # a UIManager to handle the UI.
-        # self.manager = arcade.gui.UIManager()
-        # self.manager.enable()
-
-        # set background color
-        # arcade.set_background_color(arcade.color.DARK_BLUE_GRAY)
-
 
     def on_draw(self):
         self.clear()
         self.manager.draw()
 
-
-
 class GameView(arcade.View):
-    """
-    Main application class.
-    """
-
     def __init__(self):
-        """
-        Set up the application.
-        """
         super().__init__()
         # create empty game board
         arcade.set_background_color(arcade.color.BLACK)
@@ -151,24 +135,11 @@ class GameView(arcade.View):
                 sprite.center_x = x
                 sprite.center_y = y
                 self.board_sprite_list.append(sprite)
+        self.state = self.game.initial
 
     def resync_board_with_sprites(self):
-        """
-        Update the color of all the sprites to match
-        the color/stats in the grid.
-
-        We look at the values in each cell.
-        If the cell contains 0 we assign a white color.
-        If the cell contains 1 we assign a green color.
-        """
         for row in range(ROW_COUNT):
             for column in range(COLUMN_COUNT):
-                # We need to convert our two dimensional grid to our
-                # one-dimensional sprite list. For example a 10x10 grid might have
-                # row 2, column 8 mapped to location 28. (Zero-basing throws things
-                # off, but you get the idea.)
-                # ALTERNATIVELY you could set self.grid_sprite_list[pos].texture
-                # to different textures to change the image instead of the color.
                 pos = row * COLUMN_COUNT + column
                 if self.board[row][column] == 0:
                     self.board_sprite_list[pos].color = arcade.color.WHITE
@@ -176,54 +147,41 @@ class GameView(arcade.View):
                     self.board_sprite_list[pos].color = arcade.color.GREEN
 
     def on_draw(self):
-        """
-        Render the screen.
-        """
-
         # This command has to happen before we start drawing
         self.clear()
-
         self.board_sprite_list.draw()
 
 
     def on_mouse_press(self, x, y, button, modifiers):
-        """
-        Called when the user presses a mouse button.
-        """
-
         # Change the x/y screen coordinates to grid coordinates
         column = int(x // (WIDTH + MARGIN))
         row = int(y // (HEIGHT + MARGIN))
 
+        # check boundry
         if row >= ROW_COUNT or column >= COLUMN_COUNT:
-            # Simply return from this method since nothing needs updating
             return
 
-        # Flip the location between 1 and 0.
-        if self.game.state.to_move == 'Min' and self.board[row][column] == 0:
+        if self.state.to_move == 'Min' and self.board[row][column] == 0:
             self.board[row][column] = 1
-            move = (row, column)
-            state = self.game.result(self.game.state, move)
-            self.game.state = state
-
             self.resync_board_with_sprites()
+
+            move = (row, column)
+            state = self.game.result(self.state, move)
+            self.state = state
 
             # check if player made a losing move
             if self.game.is_lose_condition(state):
                 game_over_view = GameOverView(SCREEN_WIDTH, SCREEN_HEIGHT)
                 self.window.show_view(game_over_view)
 
-        # self.resync_board_with_sprites()
-
-
     def on_update(self, delta_time):
-        state = self.game.state # or self.game.initial
+        state = self.state
         player = state.to_move
 
         if player == 'Max':
             move = AI_hard(self.game, state)
             state = self.game.result(state, move)
-            self.game.state = state
+            self.state = state
 
             row, col = move
             self.board[row][col] = 1
@@ -236,31 +194,21 @@ class GameView(arcade.View):
 
         else: return
 
-        # self.resync_board_with_sprites()
-
-
 class GameOverView(arcade.View):
-    """ View to show when game is over """
 
     def __init__(self, screen_width, screen_height):
-        """ This is run once when we switch to this view """
         super().__init__()
         self.texture = arcade.load_texture("game_over.png")
         self.screen_width = screen_width
         self.screen_height = screen_height
 
-        # Reset the viewport, necessary if we have a scrolling game and we need
-        # to reset the viewport back to the start so we can see what we draw.
-        # arcade.set_viewport(0, SCREEN_WIDTH - 1, 0, SCREEN_HEIGHT - 1)
 
     def on_draw(self):
-        """ Draw this view """
         self.clear()
         self.texture.draw_sized(self.screen_width / 2, self.screen_height / 2,
                                 self.screen_width, self.screen_height)
 
     def on_mouse_press(self, _x, _y, _button, _modifiers):
-        """ If the user presses the mouse button, re-start the game. """
         start_view = StartView()
         # start_view.setup()
         self.window.show_view(start_view)
