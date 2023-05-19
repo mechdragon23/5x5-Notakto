@@ -6,7 +6,7 @@ class Notakto(Game):
         self.board_size = len(board)
         self.value = len(board)**2
         self.initial = GameState(to_move='Max', utility=0, board=board, moves=self.getmoves(board))
-        self.state = None
+        self.state = self.initial
 
 
     # returns a list of legal moves given a state
