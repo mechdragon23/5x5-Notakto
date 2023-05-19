@@ -18,7 +18,7 @@ MARGIN = 5
 # Do the math to figure out our screen dimensions
 SCREEN_WIDTH = (WIDTH + MARGIN) * COLUMN_COUNT + MARGIN
 SCREEN_HEIGHT = (HEIGHT + MARGIN) * ROW_COUNT + MARGIN
-SCREEN_TITLE = "15 x 15 Notakto"
+SCREEN_TITLE = "Notakto - CPSC 481 - Spring 2023"
 
 class StartView(arcade.View):
     def __init__(self):
@@ -269,8 +269,7 @@ class GameOverView(arcade.View):
 
 if __name__ == "__main__":
 
-  window = arcade.Window(530, 530, "Notakto - CPSC 481 - Spring 2023", resizable=True)
+  window = arcade.Window(SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_TITLE, resizable=True)
   start_view = StartView()
-  # start_view.setup()
   window.show_view(start_view)
   arcade.run()
