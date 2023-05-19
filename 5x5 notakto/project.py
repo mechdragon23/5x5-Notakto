@@ -1,108 +1,149 @@
 from games import *
+from copy import deepcopy
 
 class Notakto(Game):
-    def __init__(self, board=[]):
-        self.initial = GameState(to_move='MIN', utility=0, board=board, moves=self.getmoves(board))
+    def __init__(self, board):
+        self.board_size = len(board)
+        self.value = len(board)**2
+        self.initial = GameState(to_move='Max', utility=0, board=board, moves=self.getmoves(board))
+        self.state = self.initial
 
-    #actions left over from game of nim, may need rework
+
+    # returns a list of legal moves given a state
     def actions(self, state):
-        return state.moves
-    
-    #move creation finished
+        return state.moves.copy()
+
+    # returns a list of the legal moves given a board
     def getmoves(self, board):
         moves = []
-        for i in range(5):  #for each row
-            for j in range(5):  #for each col
-                if board[i][j] == 0:    #if space is empty
-                    moves.append([i,j]) #add x and y cords to the moves array
-        #printing moves and board, used for debugging
-        print(moves)
-        for row in board:
-            print(row)
+
+        def is_inbound(x, y):
+            return 0 <= x < self.board_size and 0 <= y < self.board_size
+
+        # iterate over the 5x5 board
+        for i in range(self.board_size):
+            for j in range(self.board_size):
+                if board[i][j] == 0:
+
+                    # define the 8 directions to check
+                    directions = [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (-1, -1), (1, -1), (-1, 1)]
+
+                    valid = True
+                    for dx, dy in directions:
+
+                        # check one step in one direction for a 1
+                        x, y = i + dx, j + dy
+                        if is_inbound(x, y) and board[x][y] == 1:
+
+                            # check opposite direction for a 1
+                            x, y = i - dx, j - dy
+                            if is_inbound(x, y) and board[x][y] == 1:
+                                valid = False
+                                break
+
+                            # check two steps in original direction for a 1
+                            x, y = i + 2 * dx, j + 2 * dy
+                            if is_inbound(x, y) and board[x][y] == 1:
+                                valid = False
+                                break
+
+                    if valid: moves.append((i, j))
+
         return moves
 
-    #left over result functon from game of nim, non function, needs rework
+    # returns the next state given a state and a move
     def result(self, state, move):
-        #change player
-        if(state.to_move == 'MIN'):
-            newtomove = 'MAX'
-        else:
-            newtomove = 'MIN'
+        i, j = move
+        board = deepcopy(state.board)
+        board[i][j] = 1
+        return GameState(
+            to_move=('Min' if state.to_move == 'Max' else 'Max'),
+            utility=0,
+            board=board,
+            moves=self.getmoves(board)
+        )
 
-        #executing move
-        newboard = state.board.copy()
-        newboard[move[0]][move[1]] = 1
-
-        #defining moves
-        newmoves = self.getmoves(newboard)
-
-        #recalculating utility
-        if all(i == 0 for i in newboard):
-            if state.to_move == 'MAX':
-                newutil = -1
-            else:
-                newutil = 1
-        else:
-            newutil = 0
-
-        return GameState(to_move=newtomove, utility=newutil, board=newboard, moves=newmoves)
-    
-    #utility function, non functional, needs rework
+    # returns the utility value of a state
     def utility(self, state, player):
-        if(player == 'MIN'):
-            return -1
-        else:
-            return 1
+        if state.to_move == 'Max': return -self.value
+        else: return self.value
 
-    #terminal test finished
+    # returns the utility value of a state
+    def evaluation(self, state):
+        num_moves = -1 if len(state.moves) == 0 else len(state.moves)
+        if state.to_move == 'Max': return self.value/num_moves
+        else: return -self.value/num_moves
+
+    # returns true if the state is a terminal state
     def terminal_test(self, state):
-        for i in range(5):  #for each row
-            for j in range(5):  #for each col
-                #detect if X is there
+        return not self.actions(state)
+
+    # displays board to console
+    def display(self, state):
+        for row in state.board:
+            print(row)
+
+    # return true if a lose condition is met
+    def is_lose_condition(self, state):
+        for i in range(self.board_size):
+            for j in range(self.board_size):
+
                 if state.board[i][j] == 1:
-                    #checking backwards diagonal
+                    # checking diagonal up /
                     # 0 0 1
                     # 0 1 0
                     # 1 0 0
-                    if j > 1 and i < 3 and state.board[i+1][j-1] == 1 and state.board[i+2][j-2] == 1:
+                    if j < self.board_size - 2 and i > 1 and state.board[i-1][j+1] == 1 and state.board[i-2][j+2] == 1:
                         return True
                     #checking vertical down
                     # 0 1 0
                     # 0 1 0
                     # 0 1 0
-                    if i < 3 and state.board[i+1][j] == 1 and state.board[i+2][j] == 1:
+                    if i < self.board_size - 2 and state.board[i+1][j] == 1 and state.board[i+2][j] == 1:
                         return True
                     #checking diagonal down
                     # 1 0 0
                     # 0 1 0
                     # 0 0 1
-                    if i < 3 and j < 3 and state.board[i+1][j+1] == 1 and state.board[i+2][j+2] == 1:
+                    if i < self.board_size - 2 and j < self.board_size - 2 and state.board[i+1][j+1] == 1 and state.board[i+2][j+2] == 1:
                         return True
                     #checking horizontal
                     # 1 1 1
                     # 0 0 0
                     # 0 0 0
-                    if j < 3 and state.board[i][j+1] == 1 and state.board[i][j+2] == 1:
+                    if j < self.board_size - 2 and state.board[i][j+1] == 1 and state.board[i][j+2] == 1:
                         return True
         #if no match return false
         return False
 
-    #left over display function, may or may not be working
-    def display(self, state):
-        print("board:")
-        for row in state.board:
-            print(row)   
-
-#main, might need work for proper implemenetation 
 if __name__ == "__main__":
-    #setting up the board 
-    #this is a 2d array in which 0's are considered empty space and 1's are X's or occupied space
-    row = 5
-    col = 5
-    arr = [[0 for i in range(col)] for j in range(row)]
+    # returns a board (2D list) of give size
+    def board(size):
+        row = size
+        col = size
+        empty_board = [[0 for i in range(col)] for j in range(row)]
+        return empty_board
 
-    nim = Notakto(board=arr)  # Creating the game instance
-    utility = nim.play_game(alpha_beta_player, query_player) # computer moves first 
+    # create board
+    # note: the upper limit of board size is limited by time and ressources.
+    # Hard AI vs Medium AI on a 15x15 board takes about 2 min 24 sec to complete
+    SIZE = 15
+    empty_board = board(SIZE)
+
+    # initialize game instance
+    game = Notakto(board=empty_board)
+
+    ###########################################################################
+    #                      available AI's to play against                     #
+    ###########################################################################
+    #
+    # AI_silly - makes random moves
+    # AI_easy - thinks one move ahead
+    # AI_medium - thinks a few moves ahead, but panics as board size increases
+    # AI_hard - thinks a few moves ahead, and is not afraid of large boards
+
+    # AI hard beats AI medium 100% of the time
+    utility = game.play_game(AI_hard, AI_medium)
     if (utility < 0):
         print("MIN won the game")
     else:
