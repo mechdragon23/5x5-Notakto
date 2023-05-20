@@ -49,6 +49,7 @@ In the Terminal version, the player can test the different difficulty level AI's
 python project.py
 ```
 NxN Hard AI vs. Medium AI (8x8 pictured), Hard AI wins 100% of the time
+
 ![notakto-terminal](https://github.com/mechdragon23/5x5-Notakto/assets/53587310/f69a9c91-4284-41f7-8eba-b7e69ab4a0db)
 
 
