@@ -39,8 +39,7 @@ Click ```Settings``` to change AI difficulty and layout (NxN) **UNDER DEVELOPMEN
 
 Click ```Quit``` to exit game
 
-15x15 User vs. Hard AI
-
+```15x15 User vs. Hard AI```
 ![notakto-ui](https://github.com/mechdragon23/5x5-Notakto/assets/53587310/0f97adb3-9246-4458-a51f-e903056af343)
 
 ## Run app in Terminal
