@@ -189,7 +189,7 @@ class GameView(arcade.View):
 
             self.resync_board_with_sprites()
 
-            if self.game.terminal_test(state):
+            if self.game.is_lose_condition(state):
                 game_over_view = GameOverView(SCREEN_WIDTH, SCREEN_HEIGHT)
                 self.window.show_view(game_over_view)
 
